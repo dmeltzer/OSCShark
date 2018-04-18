@@ -40,6 +40,7 @@
 #include "common.h"
 #include "osclistenercontroller.h"
 
+class QHostAddress;
 
 namespace Ui {
 class MainWindow;
@@ -95,6 +96,7 @@ private:
     void processIncomingOscMessage(const OscMessageContainer*);
     bool filterOscMessage(const QString address);
     void updateLogView();
+    bool isReservedIpAddress(const QHostAddress &address);
 
 private slots:
     void handleMessage(OscMessageContainer *);

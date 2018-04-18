@@ -434,7 +434,10 @@ void MainWindow::lookupLocalAddresses()
              QString ipaddress = "IP Address: " + address.toString();
              leIpAddress->setText(ipaddress);
              found = true;
-             break;
+             // If the IP is reserved, let's use it.  Otherwise keep looping.
+             // If we loop through all without finding a reserved IP the last IP will remain available.
+             if(isReservedIpAddress(address))
+                break;
         }
     }
 
@@ -443,6 +446,14 @@ void MainWindow::lookupLocalAddresses()
     }
 }
 
+bool MainWindow::isReservedIpAddress(const QHostAddress &address)
+{
+    QPair<QHostAddress,int> classA = QHostAddress::parseSubnet("10.0.0.0/8");
+    QPair<QHostAddress,int> classB = QHostAddress::parseSubnet("172.16.0.0/12");
+    QPair<QHostAddress,int> classC = QHostAddress::parseSubnet("192.168.0.0/8");
+
+    return (address.isInSubnet(classA) || address.isInSubnet(classB) || address.isInSubnet(classC));
+}
 void MainWindow::processIncomingOscMessage(const OscMessageContainer *msg)
 {
     // Check the OSC address and save it, if it's not already saved
