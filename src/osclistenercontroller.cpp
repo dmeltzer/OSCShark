@@ -22,7 +22,7 @@
  *
  */
 
-#import <QDebug>
+#include <QDebug>
 
 #include "osclistenercontroller.h"
 
