@@ -69,6 +69,7 @@ private:
     QPushButton *bDeletePort;
     QPushButton *bClearView;
     QPushButton *bExport;
+    QPushButton *bSendOsc;
     QTextEdit *logView;
     QListWidget *lwReceivedOscAddresses;
     QListWidget *lwMonitoredOscAddresses;
@@ -101,6 +102,7 @@ private:
 private slots:
     void handleMessage(OscMessageContainer *);
     void onAddPortClicked();
+    void onSendOscClicked();
     void onDeletePortClicked();
     void onAvailablePortClicked(QListWidgetItem*);
     void onListeningPortClicked(QListWidgetItem*);

@@ -39,7 +39,8 @@
 #include "ui_mainwindow.h"
 #include "common.h"
 #include "exportdialog.h"
-
+#include "oscpkt/oscpkt.hh"
+#include "oscpkt/udp.hh"
 #include <iostream>
 using namespace std;
 
@@ -227,6 +228,13 @@ void MainWindow::setupUi()
 
     rightReceivedOscLayout->addWidget(new QLabel("Double click item to stop monitoring this OSC Address.\nWhen the list is empty every OSC address is monitored."));
 
+    QVBoxLayout *sendLayout = new QVBoxLayout();
+    rightMainLayout->addLayout(sendLayout);
+
+    bSendOsc = new QPushButton;
+    bSendOsc->setText("Send OSC Message");
+    sendLayout->addWidget(bSendOsc);
+
     this->centralWidget()->setLayout(mainLayout);
     this->setFixedSize(900, 700);
 }
@@ -234,6 +242,7 @@ void MainWindow::setupUi()
 void MainWindow::setupSignals()
 {
     connect(bAddPort, SIGNAL(clicked()), this, SLOT(onAddPortClicked()));
+    connect(bSendOsc, SIGNAL(clicked()), this, SLOT(onSendOscClicked()));
     connect(bDeletePort, SIGNAL(clicked()), this, SLOT(onDeletePortClicked()));
     connect(lwAvailablePorts, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onAvailablePortClicked(QListWidgetItem*)));
     connect(lwListeningPorts, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onListeningPortClicked(QListWidgetItem*)));
@@ -277,6 +286,40 @@ void MainWindow::onAddPortClicked()
     if (error) {
         QMessageBox box(this);
         box.setText("Could not add port");
+        box.exec();
+    }
+}
+
+
+void MainWindow::onSendOscClicked()
+{
+    bool ok, error = false;
+
+    QString sendString = QInputDialog::getText(this, tr("String to send"), tr("String"), QLineEdit::Normal,
+                          tr(""), &ok);
+    if (ok) {
+//        int port = sendString.toInt(&ok, 10);
+        oscpkt::UdpSocket *s = new oscpkt::UdpSocket;
+        s->connectTo("192.168.100.121", "7000");
+        oscpkt::PacketWriter pkt;
+        oscpkt::Message msg;
+        pkt.startBundle();
+        msg.init(sendString.toStdString());
+        qDebug() << "Message ok? " << msg.isOk();
+        pkt.addMessage(msg.init(sendString.toStdString()));
+        qDebug() << "Packet Data: " << pkt.packetData();
+        pkt.endBundle();
+        if (pkt.isOk()) {
+            qDebug() << "Sending Packet";
+            s->sendPacket(pkt.packetData(), pkt.packetSize());
+        }
+        else
+            error = true;
+    }
+
+    if (error) {
+        QMessageBox box(this);
+        box.setText("Could not send string");
         box.exec();
     }
 }
