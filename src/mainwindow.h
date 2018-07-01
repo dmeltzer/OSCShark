@@ -84,6 +84,7 @@ private:
     bool showTimestamps;
     bool showOnlyUpdatedAddresses;
     QList<QString> loggedOscAddresses;
+    QList<OscMessageContainer> loggedOscMessages;
 
     void setupUi();
     void loadSettings();

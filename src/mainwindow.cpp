@@ -300,7 +300,7 @@ void MainWindow::onSendOscClicked()
     if (ok) {
 //        int port = sendString.toInt(&ok, 10);
         oscpkt::UdpSocket *s = new oscpkt::UdpSocket;
-        s->connectTo("192.168.100.121", "7000");
+        s->connectTo("192.168.2.255", "25666");
         oscpkt::PacketWriter pkt;
         oscpkt::Message msg;
         pkt.startBundle();
@@ -518,8 +518,10 @@ void MainWindow::processIncomingOscMessage(const OscMessageContainer *msg)
     if (filterOscMessage(msg->address) || monitoredOscAddresses.count() == 0) {
         receivedMessages.append(*msg);
         if (showOnlyUpdatedAddresses) {
-            if (!loggedOscAddresses.contains(msg->address)) {
-                loggedOscAddresses.append(msg->address);
+//            if (!loggedOscAddresses.contains(msg->address)) {
+//                loggedOscAddresses.append(msg->address);
+            if(!loggedOscMessages.contains(*msg)) {
+                loggedOscMessages.append(*msg);
                 logOscMessage(msg);
             }
         }
@@ -578,8 +580,10 @@ void MainWindow::updateLogView()
     loggedOscAddresses.clear();
     foreach (OscMessageContainer msg, receivedMessages) {
         if (showOnlyUpdatedAddresses) {
-            if (!loggedOscAddresses.contains(msg.address)) {
-                loggedOscAddresses.append(msg.address);
+//            if (!loggedOscAddresses.contains(msg.address)) {
+            if(!loggedOscMessages.contains(msg)) {
+                loggedOscMessages.append(msg);
+//                loggedOscAddresses.append(msg.address);
                 logOscMessage(&msg);
             }
         }
