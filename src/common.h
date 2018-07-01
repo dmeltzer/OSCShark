@@ -27,12 +27,23 @@
 
 #include <QDateTime>
 
-typedef struct _receivedOscMessage {
+ struct OscMessageContainer {
    QString address;
    QString typeTags;
    QList<QString> arguments;
    QDateTime time;
    int port;
-} OscMessageContainer;
+
+   bool operator==(const OscMessageContainer &other) {
+       QList<QString> modifiedArguments = arguments;
+       QList<QString> modifiedOtherArguments = other.arguments;
+       // Strip out the timestamp.
+       modifiedArguments.removeAt(1);
+       modifiedOtherArguments.removeAt(1);
+       return address == other.address
+               && modifiedArguments == modifiedOtherArguments
+               && port == other.port;
+   }
+};
 
 #endif // COMMON_H
