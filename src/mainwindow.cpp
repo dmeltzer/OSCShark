@@ -41,6 +41,7 @@
 #include "exportdialog.h"
 #include "oscpkt/oscpkt.hh"
 #include "oscpkt/udp.hh"
+#include "oscmessageview.h"
 #include <iostream>
 using namespace std;
 
@@ -48,7 +49,7 @@ using namespace std;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    messageModel(0)
+    messageModel(nullptr)
 {
     ui->setupUi(this);
 
@@ -73,10 +74,13 @@ MainWindow::MainWindow(QWidget *parent) :
     // Set the icon
     //this->setWindowIcon(QIcon(":/icons/icon.png"));
 
+    // Create Underlying message model.
+
+    messageModel = new OSCMessageModel(this);
+
     // Load the settings
     loadSettings();
 
-    messageModel = new OSCMessageModel(this);
     // Create the UI
     setupUi();
 
@@ -100,6 +104,7 @@ void MainWindow::loadSettings()
     activePorts = settings.value("ports/active").value< QList<int> >();
     showTimestamps = settings.value("main/showtimestamps").value<bool>();
     showOnlyUpdatedAddresses = settings.value("main/showonlyupdatedmessages").value<bool>();
+    messageModel->setMaxMessages( settings.value("main/maxmessagehistory").value<int>());
 }
 
 void MainWindow::saveSettings()
@@ -109,6 +114,7 @@ void MainWindow::saveSettings()
     settings.setValue("ports/active", QVariant::fromValue< QList<int> >(activePorts));
     settings.setValue("main/showtimestamps", showTimestamps);
     settings.setValue("main/showonlyupdatedmessages", showOnlyUpdatedAddresses);
+    settings.setValue("main/maxmessagehistory", messageModel->maxMessages());
 }
 
 void MainWindow::setupUi()
@@ -184,6 +190,20 @@ void MainWindow::createLeftLayout()
 
     leftMainLayout->addSpacing(30);
 
+
+    QHBoxLayout *messageHistoryLayout = new QHBoxLayout();
+    QLabel *spLabel = new QLabel("Message History: ");
+    messageHistoryLayout->addWidget(spLabel);
+
+    spMaxMessages = new QSpinBox(this);
+    spMaxMessages->setMaximum(10000);
+    spMaxMessages->setMinimum(5);
+    spMaxMessages->setButtonSymbols( QAbstractSpinBox::NoButtons );
+    spMaxMessages->setValue(messageModel->maxMessages());
+    messageHistoryLayout->addWidget(spMaxMessages);
+    leftMainLayout->addLayout(messageHistoryLayout);
+    connect(spMaxMessages, SIGNAL(valueChanged(int)), messageModel, SLOT(setMaxMessages(int)));
+
     cbShowTimestamps = new QCheckBox("Show Timestamps");
     cbShowTimestamps->setChecked(showTimestamps);
     leftMainLayout->addWidget(cbShowTimestamps);
@@ -214,10 +234,8 @@ void MainWindow::createRightLayout()
     rightMainLayout = new QVBoxLayout;
     rightMainLayout->setContentsMargins(0, 0, 0, 0);
 
-    logView = new QTextEdit;
-    logView->setMinimumWidth(650);
-    logView->setMinimumHeight(400);
-    logView->setReadOnly(true);
+    logView = new OSCMessageView;
+    logView->setModel(messageModel);
     rightMainLayout->addWidget(logView);
 
     QHBoxLayout *receivedOscLayout = new QHBoxLayout();
@@ -425,7 +443,7 @@ void MainWindow::onAddOscAddressClicked(QListWidgetItem *item)
 
 void MainWindow::onRemoveMonitoredOscAddressClicked(QListWidgetItem *item)
 {
-    if (item == NULL) {
+    if (item == nullptr) {
         return;
     }
 
@@ -581,15 +599,16 @@ void MainWindow::logOscMessage(const OscMessageContainer *msg)
 
 void MainWindow::printLogMessage(const QString &msg)
 {
-    QString output;
-    output.append(msg);
-
-    logView->append(output);
+//    QString output;
+//    output.append(msg);
+qDebug() << "Outputting a new message: " << msg;
+    messageModel->addMessage(msg);
+//    logView->append(output);
 }
 
 void MainWindow::updateLogView()
 {
-    logView->clear();
+    messageModel->clear();
     loggedOscAddresses.clear();
     foreach (OscMessageContainer msg, receivedMessages) {
         if (showOnlyUpdatedAddresses) {
@@ -607,7 +626,7 @@ void MainWindow::updateLogView()
 
 void MainWindow::onClearViewsClicked()
 {
-    logView->clear();
+    messageModel->clear();
     receivedMessages.clear();
 }
 
@@ -676,4 +695,5 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete messageModel;
 }

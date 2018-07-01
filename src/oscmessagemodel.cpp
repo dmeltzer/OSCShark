@@ -25,6 +25,7 @@ OSCMessageModel::OSCMessageModel(QObject *parent)
 QVariant OSCMessageModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     // FIXME: Implement me!
+    return QVariant();
 }
 
 int OSCMessageModel::rowCount(const QModelIndex &parent) const
@@ -53,8 +54,39 @@ QVariant OSCMessageModel::data(const QModelIndex &index, int role) const
 
 bool OSCMessageModel::addMessage(const QString &message)
 {
+
     int row = messagesReceived.size();
     beginInsertRows(QModelIndex(), row, row);
     messagesReceived.append(message);
     endInsertRows();
+
+    // Prune as necessary
+    pruneMessages();
+
+    return true;
+}
+
+void OSCMessageModel::setMaxMessages(int messages)
+{
+     if (messages > 0 )
+         retainedMessages = messages;
+     pruneMessages();
+}
+
+// Remove messages > max number set to retain.
+void OSCMessageModel::pruneMessages()
+{
+    if (messagesReceived.count() >= retainedMessages) {
+        beginRemoveRows(QModelIndex(), 0, 0);
+        messagesReceived.removeAt(0);
+        endRemoveRows();
+    }
+}
+bool OSCMessageModel::clear()
+{
+    beginResetModel();
+    messagesReceived.clear();
+    endResetModel();
+
+    return true;
 }

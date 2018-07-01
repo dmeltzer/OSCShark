@@ -27,7 +27,8 @@ SOURCES += \
     src/osclistenerworker.cpp \
     src/osclistenercontroller.cpp \
     src/exportdialog.cpp \
-    src/oscmessagemodel.cpp
+    src/oscmessagemodel.cpp \
+    src/oscmessageview.cpp
 
 
 HEADERS  += \
@@ -38,7 +39,8 @@ HEADERS  += \
     src/oscpkt/oscpkt.hh \
     src/common.h \
     src/exportdialog.h \
-    src/oscmessagemodel.h
+    src/oscmessagemodel.h \
+    src/oscmessageview.h
 
 FORMS    += src/mainwindow.ui
 

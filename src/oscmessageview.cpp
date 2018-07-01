@@ -15,41 +15,43 @@
 ** along with this program; if not, write to the Free Software Foundation,**
 ** Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA      **
 ***************************************************************************/
-#ifndef OSCMESSAGEMODEL_H
-#define OSCMESSAGEMODEL_H
+#include "oscmessageview.h"
 
-#include <QAbstractListModel>
-#include <QStringList>
-
-class OSCMessageModel : public QAbstractListModel
+#include <QScrollBar>
+OSCMessageView::OSCMessageView(QWidget *parent)
+    : QListView(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit OSCMessageModel(QObject *parent = nullptr);
-
-    // Header:
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    // Basic functionality:
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-    // Add data:
-    bool addMessage(const QString &message);
-    bool clear();
+     setViewMode(QListView::ListMode);
+     setMinimumWidth(650);
+     setMinimumHeight(400);
 
 
-    int maxMessages() { return retainedMessages; };
 
-public slots:
-    void setMaxMessages(int messages);
+}
 
-private:
-    QStringList messagesReceived;
-    int retainedMessages = 15;
-    void pruneMessages();
-};
+void OSCMessageView::setModel(QAbstractItemModel *itemModel)
+{
+    QListView::setModel(itemModel);
+    connect(model(), SIGNAL(rowsAboutToBeInserted(const QModelIndex &,int,int)), this, SLOT(storeIndex()));
+    connect(model(), SIGNAL(rowsAboutToBeRemoved(const QModelIndex &,int,int)), this, SLOT(storeIndex()));
+    connect(model(), SIGNAL(rowsInserted(const QModelIndex &,int,int)), this, SLOT(maintainScroll(const QModelIndex &,int,int)));
+    connect(model(), SIGNAL(rowsRemoved(const QModelIndex &,int,int)), this, SLOT(maintainScroll(const QModelIndex &,int,int)));
+}
 
-#endif // OSCMESSAGEMODEL_H
+void OSCMessageView::storeIndex()
+{
+    m_topIndex = indexAt(QPoint(8,8));
+}
+
+void OSCMessageView::maintainScroll(const QModelIndex &parent, int begin, int end)
+{
+    // If we are at the bottom and an item is inserted, continue to scroll down
+    QScrollBar *bar = verticalScrollBar();
+    if (bar->value() == bar->maximum())
+    {
+        scrollToBottom();
+    }
+    // Otherwise remain in place
+    scrollTo(m_topIndex, QAbstractItemView::PositionAtTop); // Grab First index in view;
+
+}

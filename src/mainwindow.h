@@ -33,8 +33,10 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QList>
+#include <QListView>
 #include <QSettings>
 #include <QCloseEvent>
+#include <QSpinBox>
 #include <QCheckBox>
 
 #include "common.h"
@@ -70,7 +72,7 @@ private:
     QPushButton *bClearView;
     QPushButton *bExport;
     QPushButton *bSendOsc;
-    QTextEdit *logView;
+    QListView *logView;
     QListWidget *lwReceivedOscAddresses;
     QListWidget *lwMonitoredOscAddresses;
     QList<OscListenerController*> oscListeners;
@@ -79,6 +81,7 @@ private:
     QList<QString> receivedOscAddresses;
     QList<QString> monitoredOscAddresses;
     QList<OscMessageContainer> receivedMessages;
+    QSpinBox *spMaxMessages;
     QCheckBox *cbShowTimestamps;
     QCheckBox *cbShowOnlyUpdatedMessages;
     bool showTimestamps;

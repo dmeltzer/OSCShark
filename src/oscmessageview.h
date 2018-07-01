@@ -15,41 +15,26 @@
 ** along with this program; if not, write to the Free Software Foundation,**
 ** Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA      **
 ***************************************************************************/
-#ifndef OSCMESSAGEMODEL_H
-#define OSCMESSAGEMODEL_H
+#ifndef OSCMESSAGEVIEW_H
+#define OSCMESSAGEVIEW_H
 
-#include <QAbstractListModel>
-#include <QStringList>
+#include <QListView>
 
-class OSCMessageModel : public QAbstractListModel
+class OSCMessageView : public QListView
 {
+
     Q_OBJECT
-
 public:
-    explicit OSCMessageModel(QObject *parent = nullptr);
+    OSCMessageView(QWidget *parent = nullptr);
 
-    // Header:
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    // Basic functionality:
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-    // Add data:
-    bool addMessage(const QString &message);
-    bool clear();
-
-
-    int maxMessages() { return retainedMessages; };
+    virtual void setModel(QAbstractItemModel *itemModel) override;
 
 public slots:
-    void setMaxMessages(int messages);
+    void maintainScroll(const QModelIndex &parent, int begin, int end);
+    void storeIndex();
 
 private:
-    QStringList messagesReceived;
-    int retainedMessages = 15;
-    void pruneMessages();
+    QModelIndex m_topIndex;
 };
 
-#endif // OSCMESSAGEMODEL_H
+#endif // OSCMESSAGEVIEW_H
