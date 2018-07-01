@@ -98,6 +98,7 @@ void MainWindow::loadSettings()
     activePorts = settings.value("ports/active").value< QList<int> >();
     showTimestamps = settings.value("main/showtimestamps").value<bool>();
     showOnlyUpdatedAddresses = settings.value("main/showonlyupdatedmessages").value<bool>();
+    filterDuplicates = settings.value("main/filterduplicates").value<bool>();
 }
 
 void MainWindow::saveSettings()
@@ -107,23 +108,33 @@ void MainWindow::saveSettings()
     settings.setValue("ports/active", QVariant::fromValue< QList<int> >(activePorts));
     settings.setValue("main/showtimestamps", showTimestamps);
     settings.setValue("main/showonlyupdatedmessages", showOnlyUpdatedAddresses);
+    settings.setValue("main/filterduplicates", filterDuplicates);
 }
 
 void MainWindow::setupUi()
 {
     mainLayout = new QHBoxLayout;
-    leftMainLayout = new QVBoxLayout;
-    leftMainLayout->setContentsMargins(0, 0, 0, 0);
-    rightMainLayout = new QVBoxLayout;
-    rightMainLayout->setContentsMargins(0, 0, 0, 0);
+    createLeftLayout();
+    createRightLayout();
+
 
     mainLayout->addLayout(leftMainLayout);
     mainLayout->addLayout(rightMainLayout);
+
+    this->centralWidget()->setLayout(mainLayout);
+    this->setFixedSize(900, 700);
+}
+
+void MainWindow::createLeftLayout()
+{
+    leftMainLayout = new QVBoxLayout;
+    leftMainLayout->setContentsMargins(0, 0, 0, 0);
 
     leIpAddress = new QLineEdit;
     leIpAddress->setReadOnly(true);
     leftMainLayout->addWidget(leIpAddress);
     leftMainLayout->addSpacing(10);
+
 
     QLabel *label1 = new QLabel;
     label1->setText("LISTENING TO OSC PORTS");
@@ -166,7 +177,6 @@ void MainWindow::setupUi()
     bAddPort = new QPushButton;
     bAddPort->setText("Add Port");
     buttonLayout->addWidget(bAddPort);
-    //leftMainLayout->addWidget(bAddPort);
 
     bDeletePort = new QPushButton;
     bDeletePort->setText("Delete");
@@ -197,11 +207,22 @@ void MainWindow::setupUi()
                             QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
     leftMainLayout->addWidget(lVersion);
 
+}
+
+void MainWindow::createRightLayout()
+{
+    rightMainLayout = new QVBoxLayout;
+    rightMainLayout->setContentsMargins(0, 0, 0, 0);
+
     logView = new QTextEdit;
     logView->setMinimumWidth(650);
     logView->setMinimumHeight(400);
     logView->setReadOnly(true);
     rightMainLayout->addWidget(logView);
+
+    cbFilterDuplicates = new QCheckBox("Show Timestamps");
+    cbFilterDuplicates->setChecked(filterDuplicates);
+    leftMainLayout->addWidget(cbFilterDuplicates);
 
     QHBoxLayout *receivedOscLayout = new QHBoxLayout();
     rightMainLayout->addLayout(receivedOscLayout);
@@ -234,11 +255,7 @@ void MainWindow::setupUi()
     bSendOsc = new QPushButton;
     bSendOsc->setText("Send OSC Message");
     sendLayout->addWidget(bSendOsc);
-
-    this->centralWidget()->setLayout(mainLayout);
-    this->setFixedSize(900, 700);
 }
-
 void MainWindow::setupSignals()
 {
     connect(bAddPort, SIGNAL(clicked()), this, SLOT(onAddPortClicked()));
@@ -251,7 +268,8 @@ void MainWindow::setupSignals()
     connect(bClearView, SIGNAL(clicked()), this, SLOT(onClearViewsClicked()));
     connect(bExport, SIGNAL(clicked()), this, SLOT(onExportClicked()));
     connect(cbShowTimestamps, SIGNAL(stateChanged(int)), this, SLOT(onShowTimestampsChecked(int)));
-    connect(cbShowOnlyUpdatedMessages, SIGNAL(stateChanged(int)), this, SLOT(onShowOnlyUpdatedOscAddresses(int)));
+//    connect(cbShowOnlyUpdatedMessages, SIGNAL(stateChanged(int)), this, SLOT(onShowOnlyUpdatedOscAddresses(int)));
+    connect(cbFilterDuplicates, SIGNAL(stateChanged(int)), this, SLOT(onFilterDuplicates(int)));
 }
 
 void MainWindow::onAddPortClicked()
@@ -300,6 +318,7 @@ void MainWindow::onSendOscClicked()
     if (ok) {
 //        int port = sendString.toInt(&ok, 10);
         oscpkt::UdpSocket *s = new oscpkt::UdpSocket;
+        // TODO: Make configurable.
         s->connectTo("192.168.100.121", "7000");
         oscpkt::PacketWriter pkt;
         oscpkt::Message msg;

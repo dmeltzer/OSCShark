@@ -41,7 +41,6 @@
 #include "osclistenercontroller.h"
 
 class QHostAddress;
-
 namespace Ui {
 class MainWindow;
 }
@@ -81,8 +80,10 @@ private:
     QList<OscMessageContainer> receivedMessages;
     QCheckBox *cbShowTimestamps;
     QCheckBox *cbShowOnlyUpdatedMessages;
+    QCheckBox *cbFilterDuplicates;
     bool showTimestamps;
     bool showOnlyUpdatedAddresses;
+    bool filterDuplicates;
     QList<QString> loggedOscAddresses;
 
     void setupUi();
@@ -98,6 +99,8 @@ private:
     bool filterOscMessage(const QString address);
     void updateLogView();
     bool isReservedIpAddress(const QHostAddress &address);
+    void createLeftLayout();
+    void createRightLayout();
 
 private slots:
     void handleMessage(OscMessageContainer *);
@@ -112,6 +115,7 @@ private slots:
     void onExportClicked();
     void onShowTimestampsChecked(int state);
     void onShowOnlyUpdatedOscAddresses(int state);
+    void onFilterDuplicates(int state);
 };
 
 

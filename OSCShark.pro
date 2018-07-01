@@ -27,6 +27,7 @@ SOURCES += \
     src/osclistenerworker.cpp \
     src/osclistenercontroller.cpp \
     src/exportdialog.cpp
+#    src/ipchooser.cpp
 
 
 HEADERS  += \
@@ -37,6 +38,7 @@ HEADERS  += \
     src/oscpkt/oscpkt.hh \
     src/common.h \
     src/exportdialog.h
+#    src/ipchooser.h
 
 FORMS    += src/mainwindow.ui
 
