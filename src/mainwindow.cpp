@@ -47,7 +47,8 @@ using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    messageModel(0)
 {
     ui->setupUi(this);
 
@@ -75,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Load the settings
     loadSettings();
 
+    messageModel = new OSCMessageModel(this);
     // Create the UI
     setupUi();
 

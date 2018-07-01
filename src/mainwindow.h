@@ -39,6 +39,7 @@
 
 #include "common.h"
 #include "osclistenercontroller.h"
+#include "oscmessagemodel.h"
 
 class QHostAddress;
 
@@ -85,6 +86,7 @@ private:
     bool showOnlyUpdatedAddresses;
     QList<QString> loggedOscAddresses;
     QList<OscMessageContainer> loggedOscMessages;
+    OSCMessageModel *messageModel;
 
     void setupUi();
     void loadSettings();
