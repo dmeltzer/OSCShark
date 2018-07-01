@@ -28,7 +28,9 @@ SOURCES += \
     src/osclistenercontroller.cpp \
     src/exportdialog.cpp \
     src/oscmessagemodel.cpp \
-    src/oscmessageview.cpp
+    src/oscmessageview.cpp \
+#    src/ipchooser.cpp
+    src/iplineedit.cpp
 
 
 HEADERS  += \
@@ -40,9 +42,12 @@ HEADERS  += \
     src/common.h \
     src/exportdialog.h \
     src/oscmessagemodel.h \
-    src/oscmessageview.h
+    src/oscmessageview.h \
+#    src/ipchooser.h
+    src/iplineedit.h
 
-FORMS    += src/mainwindow.ui
+FORMS    += src/mainwindow.ui \
+    src/sendoscform.ui
 
 OTHER_FILES += \
     src/stylesheet.qss

@@ -37,6 +37,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ui_sendoscform.h"
 #include "common.h"
 #include "exportdialog.h"
 #include "oscpkt/oscpkt.hh"
@@ -52,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     messageModel(nullptr)
 {
     ui->setupUi(this);
+
 
 // Font Fix for Mac OS X Mavericks
 #ifdef Q_OS_MACX
@@ -326,12 +328,31 @@ void MainWindow::onSendOscClicked()
 {
     bool ok, error = false;
 
-    QString sendString = QInputDialog::getText(this, tr("String to send"), tr("String"), QLineEdit::Normal,
-                          tr(""), &ok);
-    if (ok) {
-//        int port = sendString.toInt(&ok, 10);
+//    QString sendString = QInputDialog::getText(this, tr("String to send"), tr("String"), QLineEdit::Normal,
+//                          tr(""), &ok);
+
+//    QQmlEngine engine;
+//    QQmlComponent component(&engine, QUrl(QStringLiteral("qrc:/SendOscDialog.qml")));
+//    qDebug() << "Opening component";
+////    QObject *myObject = component.create();
+//    QQuickItem *childItem = qobject_cast<QQuickItem*>(component.create());
+    Ui::SendOscDialog dlg;
+    QDialog *dialog = new QDialog;
+    dlg.setupUi(dialog);
+
+    int result = dialog->exec();
+
+    const QString ipAddress = dlg.ipAddress->text();
+    int port = dlg.port->value();
+    const QString sendString = dlg.oscString->text();
+
+    qDebug() << "Address: " << ipAddress << " port: " << port << " String: " << sendString;
+    if (result == QDialog::Accepted) {
+        const QString ipAddress = dlg.ipAddress->text();
+        int port = dlg.port->value();
+        const QString sendString = dlg.oscString->text();
         oscpkt::UdpSocket *s = new oscpkt::UdpSocket;
-        s->connectTo("192.168.2.255", "25666");
+        s->connectTo(ipAddress.toStdString(), std::to_string(port));
         oscpkt::PacketWriter pkt;
         oscpkt::Message msg;
         pkt.startBundle();
@@ -601,7 +622,6 @@ void MainWindow::printLogMessage(const QString &msg)
 {
 //    QString output;
 //    output.append(msg);
-qDebug() << "Outputting a new message: " << msg;
     messageModel->addMessage(msg);
 //    logView->append(output);
 }
