@@ -42,7 +42,6 @@
 #include "oscmessagemodel.h"
 
 class QHostAddress;
-
 namespace Ui {
 class MainWindow;
 }
@@ -101,6 +100,8 @@ private:
     bool filterOscMessage(const QString address);
     void updateLogView();
     bool isReservedIpAddress(const QHostAddress &address);
+    void createLeftLayout();
+    void createRightLayout();
 
 private slots:
     void handleMessage(OscMessageContainer *);

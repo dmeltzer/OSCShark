@@ -114,18 +114,27 @@ void MainWindow::saveSettings()
 void MainWindow::setupUi()
 {
     mainLayout = new QHBoxLayout;
-    leftMainLayout = new QVBoxLayout;
-    leftMainLayout->setContentsMargins(0, 0, 0, 0);
-    rightMainLayout = new QVBoxLayout;
-    rightMainLayout->setContentsMargins(0, 0, 0, 0);
+    createLeftLayout();
+    createRightLayout();
+
 
     mainLayout->addLayout(leftMainLayout);
     mainLayout->addLayout(rightMainLayout);
+
+    this->centralWidget()->setLayout(mainLayout);
+    this->setFixedSize(900, 700);
+}
+
+void MainWindow::createLeftLayout()
+{
+    leftMainLayout = new QVBoxLayout;
+    leftMainLayout->setContentsMargins(0, 0, 0, 0);
 
     leIpAddress = new QLineEdit;
     leIpAddress->setReadOnly(true);
     leftMainLayout->addWidget(leIpAddress);
     leftMainLayout->addSpacing(10);
+
 
     QLabel *label1 = new QLabel;
     label1->setText("LISTENING TO OSC PORTS");
@@ -168,7 +177,6 @@ void MainWindow::setupUi()
     bAddPort = new QPushButton;
     bAddPort->setText("Add Port");
     buttonLayout->addWidget(bAddPort);
-    //leftMainLayout->addWidget(bAddPort);
 
     bDeletePort = new QPushButton;
     bDeletePort->setText("Delete");
@@ -198,6 +206,13 @@ void MainWindow::setupUi()
     QLabel *lVersion = new QLabel("OSC Shark v" +
                             QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
     leftMainLayout->addWidget(lVersion);
+
+}
+
+void MainWindow::createRightLayout()
+{
+    rightMainLayout = new QVBoxLayout;
+    rightMainLayout->setContentsMargins(0, 0, 0, 0);
 
     logView = new QTextEdit;
     logView->setMinimumWidth(650);
@@ -236,11 +251,7 @@ void MainWindow::setupUi()
     bSendOsc = new QPushButton;
     bSendOsc->setText("Send OSC Message");
     sendLayout->addWidget(bSendOsc);
-
-    this->centralWidget()->setLayout(mainLayout);
-    this->setFixedSize(900, 700);
 }
-
 void MainWindow::setupSignals()
 {
     connect(bAddPort, SIGNAL(clicked()), this, SLOT(onAddPortClicked()));
