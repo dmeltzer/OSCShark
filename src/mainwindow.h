@@ -80,10 +80,8 @@ private:
     QList<OscMessageContainer> receivedMessages;
     QCheckBox *cbShowTimestamps;
     QCheckBox *cbShowOnlyUpdatedMessages;
-    QCheckBox *cbFilterDuplicates;
     bool showTimestamps;
     bool showOnlyUpdatedAddresses;
-    bool filterDuplicates;
     QList<QString> loggedOscAddresses;
 
     void setupUi();
@@ -115,7 +113,6 @@ private slots:
     void onExportClicked();
     void onShowTimestampsChecked(int state);
     void onShowOnlyUpdatedOscAddresses(int state);
-    void onFilterDuplicates(int state);
 };
 
 

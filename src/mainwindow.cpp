@@ -98,7 +98,6 @@ void MainWindow::loadSettings()
     activePorts = settings.value("ports/active").value< QList<int> >();
     showTimestamps = settings.value("main/showtimestamps").value<bool>();
     showOnlyUpdatedAddresses = settings.value("main/showonlyupdatedmessages").value<bool>();
-    filterDuplicates = settings.value("main/filterduplicates").value<bool>();
 }
 
 void MainWindow::saveSettings()
@@ -108,7 +107,6 @@ void MainWindow::saveSettings()
     settings.setValue("ports/active", QVariant::fromValue< QList<int> >(activePorts));
     settings.setValue("main/showtimestamps", showTimestamps);
     settings.setValue("main/showonlyupdatedmessages", showOnlyUpdatedAddresses);
-    settings.setValue("main/filterduplicates", filterDuplicates);
 }
 
 void MainWindow::setupUi()
@@ -220,10 +218,6 @@ void MainWindow::createRightLayout()
     logView->setReadOnly(true);
     rightMainLayout->addWidget(logView);
 
-    cbFilterDuplicates = new QCheckBox("Show Timestamps");
-    cbFilterDuplicates->setChecked(filterDuplicates);
-    leftMainLayout->addWidget(cbFilterDuplicates);
-
     QHBoxLayout *receivedOscLayout = new QHBoxLayout();
     rightMainLayout->addLayout(receivedOscLayout);
 
@@ -268,8 +262,7 @@ void MainWindow::setupSignals()
     connect(bClearView, SIGNAL(clicked()), this, SLOT(onClearViewsClicked()));
     connect(bExport, SIGNAL(clicked()), this, SLOT(onExportClicked()));
     connect(cbShowTimestamps, SIGNAL(stateChanged(int)), this, SLOT(onShowTimestampsChecked(int)));
-//    connect(cbShowOnlyUpdatedMessages, SIGNAL(stateChanged(int)), this, SLOT(onShowOnlyUpdatedOscAddresses(int)));
-    connect(cbFilterDuplicates, SIGNAL(stateChanged(int)), this, SLOT(onFilterDuplicates(int)));
+    connect(cbShowOnlyUpdatedMessages, SIGNAL(stateChanged(int)), this, SLOT(onShowOnlyUpdatedOscAddresses(int)));
 }
 
 void MainWindow::onAddPortClicked()
